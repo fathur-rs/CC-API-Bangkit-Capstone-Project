@@ -6,7 +6,7 @@ import uuid
 import os
 from typing import List
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv('app/routes/.env')
 
 from ..utils.object_utils import (
     TFModel, process_image, 
@@ -21,6 +21,9 @@ router = APIRouter()
 model = TFModel()
 def get_model():
     return model
+
+RECIPE_API_URL = os.getenv('RECIPE_API_URL')
+print(RECIPE_API_URL)
 
 @router.post("/ingredients/upload-multiple", response_model=Ingredients)
 async def create_upload_files(files: List[UploadFile] = File(...), model: TFModel = Depends(get_model)):
@@ -55,7 +58,6 @@ async def create_upload_files(files: List[UploadFile] = File(...), model: TFMode
                 combined_results[key] = value
 
     req_body = {"ingredients": " ".join([item.lower() for item in combined_results.keys()]), "limit": "all"}
-    RECIPE_API_URL = os.getenv('RECIPE_API_URL')
 
     async with httpx.AsyncClient() as client:
         rec_response = await client.post(RECIPE_API_URL, json=req_body)
@@ -63,7 +65,4 @@ async def create_upload_files(files: List[UploadFile] = File(...), model: TFMode
     return {"ingredients": combined_results, "recommendations": rec_response.json()}
         
 
-    
-
-    
     

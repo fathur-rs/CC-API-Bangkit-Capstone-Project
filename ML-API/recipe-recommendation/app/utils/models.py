@@ -16,6 +16,7 @@ class Recipe(BaseModel):
     preparation: str
     calories: str
     carb: str
+    protein: str
     fat: str
     types: str
     category: str
